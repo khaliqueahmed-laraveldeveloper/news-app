@@ -1,6 +1,8 @@
 import { Component } from 'react'
 import NewsItem from './NewsItem'
 import InfiniteScroll from 'react-infinite-scroll-component';
+// import progress from '../Components/LoadingBar';
+import LoadingBar from 'react-top-loading-bar'
 export default class NewsComponent extends Component {
 
 
@@ -11,6 +13,8 @@ export default class NewsComponent extends Component {
             articles: [],
             loading: false,
             page: 1,
+            progress: 0,
+            totelResults: 0
         }
     }
     static defaultProps = {
@@ -43,7 +47,11 @@ export default class NewsComponent extends Component {
             page: this.state.page - 1
         });
     }
+    setProgress = (progress) => {
+        this.setState({ progress: progress });
+    }
     handelLoading = async () => {
+        this.setProgress(10);
         console.log("loading");
         let url = `https://newsapi.org/v2/top-headlines?country=us&category=${this.props.category}&page=${this.state.page + 1}&apiKey=571bbf1be7e94d238157dfac4a7bfd84&pageSize=${this.props.pageSize}`;
         let data = await fetch(url);
@@ -54,6 +62,7 @@ export default class NewsComponent extends Component {
             page: this.state.page + 1,
             totalResults: parsedData.totalResults // Corrected spelling
         });
+        this.setProgress(100);
     }
     componentDidMount = async () => {
         this.fetchNews();
@@ -89,6 +98,11 @@ export default class NewsComponent extends Component {
     render() {
         return (
             <>
+                <LoadingBar
+                    color='#f11946' // Red color like YouTube
+                    progress={this.state.progress}
+                    onLoaderFinished={() => this.setProgress(0)}
+                />
 
 
                 <div>
